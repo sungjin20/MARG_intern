@@ -306,6 +306,84 @@ class CustomEncoder(nn.Module):
                 ``(batch, seq_length, dimension)``
             * output_lengths (torch.LongTensor): The length of output tensor. ``(batch)``
         """
+        inputs = inputs.permute(0, 2, 1)
+        outputs = self.pre_conv(inputs)
+        outputs = outputs.permute(0, 2, 1)
+
+        for layer in self.layers:
+            outputs = layer(outputs)
+            
+        return outputs
+
+
+class CustomEncoder2(nn.Module):
+    def __init__(
+            self,
+            input_dim: int = 80,
+            encoder_dim: int = 512,
+            num_layers: int = 17,
+            num_attention_heads: int = 8,
+            feed_forward_expansion_factor: int = 4,
+            conv_expansion_factor: int = 2,
+            input_dropout_p: float = 0.1,
+            feed_forward_dropout_p: float = 0.1,
+            attention_dropout_p: float = 0.1,
+            conv_dropout_p: float = 0.1,
+            conv_kernel_size: int = 31,
+            half_step_residual: bool = True,
+    ):
+        super(CustomEncoder2, self).__init__()
+        self.pre_conv = nn.Conv1d(in_channels=input_dim, out_channels=encoder_dim, kernel_size=3, padding=1)
+        #self.input_projection = nn.Sequential(
+        #    Linear(encoder_dim * (((input_dim - 1) // 2 - 1) // 2), encoder_dim),
+        #    nn.Dropout(p=input_dropout_p),
+        #)
+        self.layers = nn.ModuleList([ConformerBlock(
+            encoder_dim=encoder_dim,
+            num_attention_heads=num_attention_heads,
+            feed_forward_expansion_factor=feed_forward_expansion_factor,
+            conv_expansion_factor=conv_expansion_factor,
+            feed_forward_dropout_p=feed_forward_dropout_p,
+            attention_dropout_p=attention_dropout_p,
+            conv_dropout_p=conv_dropout_p,
+            conv_kernel_size=conv_kernel_size,
+            half_step_residual=half_step_residual,
+        ) for _ in range(num_layers)])
+
+        #self.pre_conv = nn.Sequential(
+        #            nn.Conv1d(in_channels=input_dim, out_channels=encoder_dim, kernel_size=5, padding=2),
+        #            nn.ReLU(),
+                    # nn.ConvTranspose1d(in_channels=encoder_dim, out_channels=encoder_dim, kernel_size=4, stride=2, padding=(4 - 2) // 2),
+                    # nn.ReLU(),
+        #        )
+        
+    def count_parameters(self) -> int:
+        """ Count parameters of encoder """
+        return sum([p.numel() for p in self.parameters()])
+
+    def update_dropout(self, dropout_p: float) -> None:
+        """ Update dropout probability of encoder """
+        for name, child in self.named_children():
+            if isinstance(child, nn.Dropout):
+                child.p = dropout_p
+
+    def forward(self, inputs: Tensor) -> Tuple[Tensor]:
+        """
+        Forward propagate a `inputs` for  encoder training.
+
+        Args:
+            inputs (torch.FloatTensor): A input sequence passed to encoder. Typically for inputs this will be a padded
+                `FloatTensor` of size ``(batch, seq_length, dimension)``.
+            input_lengths (torch.LongTensor): The length of input tensor. ``(batch)``
+
+        Returns:
+            (Tensor, Tensor)
+
+            * outputs (torch.FloatTensor): A output sequence of encoder. `FloatTensor` of size
+                ``(batch, seq_length, dimension)``
+            * output_lengths (torch.LongTensor): The length of output tensor. ``(batch)``
+        """
+        inputs = inputs.permute(0, 2, 1)
         outputs = self.pre_conv(inputs)
         outputs = outputs.permute(0, 2, 1)
 

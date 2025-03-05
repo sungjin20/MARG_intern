@@ -64,7 +64,7 @@ model_args = VitsArgs(
     num_languages=6
 )
 
-phoneme_cache_folder_path = '/home/research/phoneme_cache'
+phoneme_cache_folder_path = '/home/research/phoneme_cache_standard_2'
 
 # 일반 학습 구성. 여기에서 배치 크기 및 기타 유용한 매개변수를 변경할 수 있음
 config = VitsConfig(
@@ -157,7 +157,7 @@ model = Vits.init_from_config(config)
 # 학습기 초기화 및 🚀 시작
 trainer = Trainer(
     #TrainerArgs(continue_path='/data2/personal/sungjin/korean_standard/YourTTS-ko-standard-February-06-2025_04+11PM-0000000', gpu=2), # gpu번호 설정
-    TrainerArgs(gpu=2), # gpu번호 설정
+    TrainerArgs(gpu=6), # gpu번호 설정
     config,  # 모델 구성
     output_path=OUT_PATH,  # 출력 경로
     model=model,  # 모델 객체

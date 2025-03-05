@@ -42,6 +42,10 @@ for file in files:
                 length = utt["end"] - utt["start"]
                 path = id + "/" + utt["id"].replace('.', '_') + ".wav"
                 if (length >= 1) and (length <= 6) and os.path.exists(os.path.join(wav_directory, path)):
+                    if '워메' in utt["dialect_form"]:
+                        print("dialect : " + utt["dialect_form"])
+                        print(file)
+                        print(os.path.join(wav_directory, path))
                     nop_good_len += length
                     nop_good_len_num += 1
                 else:

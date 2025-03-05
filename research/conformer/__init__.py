@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .model import Conformer, CustomConformer
+from .model import Conformer, CustomConformer, CustomConformer2, CustomConformer3

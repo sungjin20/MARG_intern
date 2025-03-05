@@ -5,14 +5,15 @@ from TTS.config.shared_configs import BaseDatasetConfig
 from TTS.tts.configs.vits_config import VitsConfig
 from TTS.tts.datasets import load_tts_samples
 from TTS.tts.models.vits import CharactersConfig, Vits, VitsArgs, VitsAudioConfig
+import json
 
 # 실행을 위한 이름
-RUN_NAME = "YourTTS-ko-standard"
+RUN_NAME = "YourTTS-ko-ft-softlabel-ckp46"
 
 # 모델 출력(구성, 체크포인트, 텐서보드 로그)을 저장할 경로
 OUT_PATH = '/data2/personal/sungjin/korean_standard'  # "/raid/coqui/Checkpoints/original-YourTTS/"
 
-RESTORE_PATH = '/data2/personal/sungjin/korean_standard/YourTTS-ko-standard-February-11-2025_04+59PM-0000000/best_model_66135.pth'
+RESTORE_PATH = '/data2/personal/sungjin/korean_standard/YourTTS-ko-standard-February-16-2025_12+40PM-165e9d5a/checkpoint_460000.pth'
 
 # 학습 및 평가에 사용할 배치 크기를 여기에서 설정합니다.
 BATCH_SIZE = 28
@@ -81,9 +82,7 @@ DATASETS_CONFIG_LIST = [standard_data_config, Chungcheong_data_config, Gangwon_d
 
 D_VECTOR_FILES = []  # 학습 중에 사용할 스피커 임베딩/d-벡터 목록
 
-for dataset_conf in DATASETS_CONFIG_LIST:
-    embeddings_file = os.path.join(dataset_conf.path, "speakers.json")
-    D_VECTOR_FILES.append(embeddings_file)
+D_VECTOR_FILES.append("/data2/personal/sungjin/korean_dialects/speakers_mixed.json")
 
 # 학습에 사용되는 오디오 구성
 audio_config = VitsAudioConfig(
@@ -111,7 +110,7 @@ model_args = VitsArgs(
     num_languages=6
 )
 
-phoneme_cache_folder_path = '/home/research/phoneme_cache_finetune'
+phoneme_cache_folder_path = '/home/research/phoneme_cache_ft_softlabel_ckp46'
 
 # 일반 학습 구성. 여기에서 배치 크기 및 기타 유용한 매개변수를 변경할 수 있음
 config = VitsConfig(
@@ -198,11 +197,17 @@ config = VitsConfig(
     speaker_encoder_loss_alpha=9.0,
 )
 
-# 학습 샘플 및 평가 샘플 로드
-train_samples, eval_samples = load_tts_samples(
-    config.datasets,
-    eval_split=True,  # 학습 및 평가 데이터를 분리
-)
+data_dir = "/data2/personal/sungjin/quick_load_samples"
+regions = ["standard", "Chungcheong", "Gangwon", "Gyeongsang", "Jeju", "Jeolla"]
+train_samples = []
+eval_samples = []
+for region in regions:
+    train_path = os.path.join(data_dir, f"{region}_train_samples.json")
+    eval_path = os.path.join(data_dir, f"{region}_eval_samples.json")
+    with open(train_path, "r", encoding="utf-8") as train_file:
+        train_samples += json.load(train_file)
+    with open(eval_path, "r", encoding="utf-8") as eval_file:
+        eval_samples += json.load(eval_file)
 
 # 모델 초기화
 model = Vits.init_from_config(config)
@@ -210,7 +215,7 @@ model = Vits.init_from_config(config)
 # 학습기 초기화 및 🚀 시작
 trainer = Trainer(
     #TrainerArgs(continue_path='/data2/personal/sungjin/korean_standard/YourTTS-ko-standard-February-06-2025_04+11PM-0000000', gpu=2), # gpu번호 설정
-    TrainerArgs(restore_path=RESTORE_PATH, gpu=), # gpu번호 설정
+    TrainerArgs(restore_path=RESTORE_PATH, gpu=3), # gpu번호 설정
     config,  # 모델 구성
     output_path=OUT_PATH,  # 출력 경로
     model=model,  # 모델 객체

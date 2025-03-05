@@ -9,17 +9,23 @@ gp = Graphemes(
     pad="_",
     eos="&",
     bos="*",
-    characters="".join(sorted(set(KOREAN_PHONEMES))),
+    blank=None,
+    characters=KOREAN_PHONEMES,
     punctuations=korean_punctuations,
     is_unique=True,
     is_sorted=True
 )
 
+print(gp.id_to_char(0))
+print(gp.id_to_char(1))
+print(gp.id_to_char(2))
+print(len(gp.vocab))
+
 phonemizer = KO_KR_Phonemizer()
 
 tokenizer = TTSTokenizer(characters=gp, phonemizer=phonemizer)
 
-text = "안녕하세요"
+text = "저를 따라오세요."
 print(text)
 text = phonemizer.phonemize(text)
 print(text)

@@ -13,7 +13,7 @@ checkpoint_dir = '/data2/personal/sungjin/korean_dialects/checkpoint_real'
 wav_path = 'test.wav'
 
 # 디바이스 설정
-device = torch.device('cuda:3')
+device = torch.device('cuda:6')
 
 # 모델 로드 (초기화만 수행, 이후 반복문에서 가중치 로드)
 num_classes = 6  # 학습 시 설정한 클래스 수와 동일해야 함
@@ -73,7 +73,7 @@ logmel = logmel_transform(waveform).squeeze(0)  # [1, 80, T] → [80, T]
 logmel = logmel.unsqueeze(0).to(device)  # [1, 80, T]
 
 # 여러 에폭 체크포인트에 대해 추론 수행
-for epoch in range(2, 40, 2):  # 2, 4, 6, ..., 38
+for epoch in range(2, 120, 2):  # 2, 4, 6, ..., 38
     checkpoint_path = os.path.join(checkpoint_dir, f'checkpoint_epoch_{epoch}.pth')
 
     # 체크포인트가 존재하는지 확인 후 로드

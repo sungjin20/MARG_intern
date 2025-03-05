@@ -15,8 +15,8 @@ model = EncoderClassifier.from_hparams(
 )
 
 # wav 폴더 경로
-wav_folder = "/data2/personal/sungjin/korean_dialects/modified/Gyeongsang/wav"
-embedding_folder = "/data2/personal/sungjin/korean_dialects/modified/Gyeongsang/embedding"
+wav_folder = "/data2/personal/sungjin/korean_dialects/modified/Jeolla/wav"
+embedding_folder = "/data2/personal/sungjin/korean_dialects/modified/Jeolla/embedding"
 
 # wav 폴더 내의 모든 .wav 파일 목록 가져오기
 wav_files = []
@@ -27,7 +27,7 @@ for root, dirs, files in os.walk(wav_folder):
 
 wav_files.sort()
 print(len(wav_files))
-wav_files = wav_files[750000:]
+wav_files = wav_files[250000:]
 
 # tqdm을 이용한 진행 상태 표시
 for wav_path in tqdm(wav_files, desc="Embedding WAV files", unit="file"):
@@ -43,6 +43,10 @@ for wav_path in tqdm(wav_files, desc="Embedding WAV files", unit="file"):
 
         # 음성 파일 로드
         signal, sr = torchaudio.load(wav_path)
+
+        # 스테레오인 경우 모노로 변환 (채널 수가 2일 때)
+        if signal.shape[0] == 2:
+            signal = signal.mean(dim=0, keepdim=True)
 
         # GPU로 이동
         signal = signal.to(device)
