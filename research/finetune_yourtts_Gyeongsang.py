@@ -13,7 +13,7 @@ RUN_NAME = "YourTTS-ko-ft-Gyeongsang"
 # 모델 출력(구성, 체크포인트, 텐서보드 로그)을 저장할 경로
 OUT_PATH = '/data2/personal/sungjin/korean_standard'  # "/raid/coqui/Checkpoints/original-YourTTS/"
 
-RESTORE_PATH = '/data2/personal/sungjin/korean_standard/checkpoint_280000.pth'
+CONTINUE_PATH = '/data2/personal/sungjin/korean_standard/YourTTS-ko-ft-Gyeongsang-February-21-2025_09+33AM-165e9d5a'
 
 # 학습 및 평가에 사용할 배치 크기를 여기에서 설정합니다.
 BATCH_SIZE = 28
@@ -140,7 +140,7 @@ model = Vits.init_from_config(config)
 # 학습기 초기화 및 🚀 시작
 trainer = Trainer(
     #TrainerArgs(continue_path='/data2/personal/sungjin/korean_standard/YourTTS-ko-standard-February-06-2025_04+11PM-0000000', gpu=2), # gpu번호 설정
-    TrainerArgs(restore_path=RESTORE_PATH, gpu=5), # gpu번호 설정
+    TrainerArgs(continue_path=CONTINUE_PATH, gpu=1), # gpu번호 설정
     config,  # 모델 구성
     output_path=OUT_PATH,  # 출력 경로
     model=model,  # 모델 객체

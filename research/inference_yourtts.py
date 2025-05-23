@@ -1,10 +1,10 @@
 from TTS.utils.synthesizer import Synthesizer
 import os
 
-device = "cuda:11"
+device = "cuda:0"
 out_path = "/data2/personal/sungjin/demo"
 
-tts_path = "/data2/personal/sungjin/korean_standard/YourTTS-ko-ft-softlabel-ckp28-February-24-2025_07+58AM-165e9d5a/checkpoint_440000.pth"
+tts_path = "/data2/personal/sungjin/korean_standard/YourTTS-ko-ft-softlabel-ckp28-February-24-2025_07+58AM-165e9d5a/checkpoint_600000.pth"
 tts_config_path = "/data2/personal/sungjin/korean_standard/YourTTS-ko-ft-softlabel-ckp28-February-24-2025_07+58AM-165e9d5a/config.json"
 speakers_file_path = None
 language_ids_file_path = None
@@ -55,6 +55,6 @@ for i in range(20):
     folder_path = out_path + "/" + text
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
-    out_file_path = folder_path + "/demo_Gyeongsang_" + str(i) + ".wav"
+    out_file_path = folder_path + "/demo_Gyeongsang_0_" + str(i) + ".wav"
     print(" > Saving output to {}".format(out_file_path))
     synthesizer.save_wav(wav, out_file_path, pipe_out=False)
